@@ -2,7 +2,7 @@ SHELL := /bin/bash
 PATH := ./node_modules/.bin:$(PATH)
 
 dev-server:
-	webpack-dev-server --hot --quiet
+	webpack-dev-server --hot
 
 ts-check:
 	tsc -p . -w --noEmit --pretty

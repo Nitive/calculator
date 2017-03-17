@@ -2,11 +2,14 @@ const path = require('path')
 const { HotModuleReplacementPlugin } = require('webpack')
 
 module.exports = {
-  entry: ['./src/index.ts'],
+  entry: {
+    app: './src/index.ts',
+    events: './src/events.ts',
+  },
   output: {
     path: path.join(__dirname, 'dist'),
     publicPath: '/assets',
-    filename: 'app.js',
+    filename: '[name].js',
   },
   resolve: {
     extensions: ['.ts', '.js'],
