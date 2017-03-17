@@ -1,7 +1,8 @@
+import xs from 'xstream'
+import fromEvent from 'xstream/extra/fromEvent'
+
 interface State {
-  onePressed: boolean,
-  twoPressed: boolean,
-  threePressed: boolean,
+  allButtonsPressed: boolean,
 }
 
 const app = document.querySelector('#app')!
@@ -14,34 +15,30 @@ app.innerHTML = `
 
 function render(state: State) {
   const span = app.querySelector('span')!
-  span.innerHTML = state.onePressed && state.twoPressed && state.threePressed
+  span.innerHTML = state.allButtonsPressed
     ? 'All buttons was pressed'
     : ''
 }
 
 const state: State = {
-  onePressed: false,
-  twoPressed: false,
-  threePressed: false,
+  allButtonsPressed: false,
 }
 
 render(state)
 
 
 const one = document.querySelector('.one') as HTMLButtonElement
-one.addEventListener('click', () => {
-  state.onePressed = true
-  render(state)
-})
-
 const two = document.querySelector('.two') as HTMLButtonElement
-two.addEventListener('click', () => {
-  state.twoPressed = true
-  render(state)
-})
-
 const three = document.querySelector('.two') as HTMLButtonElement
-three.addEventListener('click', () => {
-  state.threePressed = true
-  render(state)
+
+const allButtonsPressed$ = xs.combine(
+  fromEvent(one, 'click'),
+  fromEvent(two, 'click'),
+  fromEvent(three, 'click'),
+)
+
+allButtonsPressed$.addListener({
+  next: () => {
+    render({ allButtonsPressed: true })
+  },
 })

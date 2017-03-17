@@ -5,6 +5,7 @@ module.exports = {
   entry: {
     app: './src/index.ts',
     events: './src/events.ts',
+    streams: './src/streams.ts',
   },
   output: {
     path: path.join(__dirname, 'dist'),
