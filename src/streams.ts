@@ -1,59 +1,43 @@
-import h from 'snabbdom/h'
-import { init } from 'snabbdom'
-import { VNode } from 'snabbdom/vnode'
-import fromEvent from 'xstream/extra/fromEvent'
-import xs from 'xstream'
+import { button, div, makeDOMDriver, DOMSource, VNode } from '@cycle/dom'
+import { run, FantasyObservable } from '@cycle/run'
+import xs, { Stream } from 'xstream'
 
-const patch = init([])
-let prevVtree: Element | VNode = document.querySelector('#app')!
-
-function updateDOM(vtree: VNode) {
-  patch(prevVtree, vtree)
-  prevVtree = vtree
+interface Sources {
+  DOM: DOMSource,
 }
 
-interface State {
-  allButtonsPressed: boolean,
+interface Sinks {
+  DOM: Stream<VNode>
+  [key: string]: FantasyObservable
 }
 
-const state: State = {
-  allButtonsPressed: false,
+function main(sources: Sources): Sinks {
+  const allButtonsPressed$ = xs
+    .combine(
+      sources.DOM.select('.one').events('click'),
+      sources.DOM.select('.two').events('click'),
+      sources.DOM.select('.three').events('click'),
+    )
+    .mapTo(true)
+    .startWith(false)
+
+  const vtree$ = allButtonsPressed$
+    .map(allButtonsPressed => {
+      return div([
+        button('.one', '1'),
+        button('.two', '2'),
+        button('.three', '3'),
+        allButtonsPressed
+          ? 'All buttons are pressed'
+          : '',
+      ])
+    })
+
+  return {
+    DOM: vtree$,
+  }
 }
 
-function render(state: State) {
-  return h('div', [
-    h('button.one', '1'),
-    h('button.two', '2'),
-    h('button.three', '3'),
-    state.allButtonsPressed
-      ? 'All buttons are pressed'
-      : '',
-  ])
-}
-
-function update(state: State) {
-  const vtree = render(state)
-  updateDOM(vtree)
-}
-
-update(state)
-
-const one = document.querySelector('.one') as HTMLButtonElement
-const two = document.querySelector('.two') as HTMLButtonElement
-const three = document.querySelector('.three') as HTMLButtonElement
-
-const allButtonsPressed$ = xs
-  .combine(
-    fromEvent(one, 'click'),
-    fromEvent(two, 'click'),
-    fromEvent(three, 'click'),
-  )
-  .mapTo(true)
-  .startWith(false)
-
-allButtonsPressed$.addListener({
-  next: allButtonsPressed => {
-    state.allButtonsPressed = allButtonsPressed
-    update(state)
-  },
+run(main, {
+  DOM: makeDOMDriver('#app'),
 })
