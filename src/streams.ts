@@ -36,17 +36,16 @@ function update(state: State) {
   updateDOM(vtree)
 }
 
-update(state)
-
-const one = document.querySelector('.one') as HTMLButtonElement
-const two = document.querySelector('.two') as HTMLButtonElement
-const three = document.querySelector('.three') as HTMLButtonElement
+function selectEvents(selector: string, event: string) {
+  return fromEvent(document.body, event)
+    .filter(e => e.target.matches(selector))
+}
 
 const allButtonsPressed$ = xs
   .combine(
-    fromEvent(one, 'click'),
-    fromEvent(two, 'click'),
-    fromEvent(three, 'click'),
+    selectEvents('.one', 'click'),
+    selectEvents('.two', 'click'),
+    selectEvents('.three', 'click'),
   )
   .mapTo(true)
   .startWith(false)
@@ -56,4 +55,5 @@ allButtonsPressed$.addListener({
     state.allButtonsPressed = allButtonsPressed
     update(state)
   },
+  error: err => console.error(err),
 })
