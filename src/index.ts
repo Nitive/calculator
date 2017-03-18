@@ -1,3 +1,5 @@
+// сказать, что надо изолировать сайд эффекты
+
 import { Stream } from 'xstream'
 import { DOMSource, VNode, makeDOMDriver } from '@cycle/dom'
 import { run, Drivers, FantasyObservable } from '@cycle/run'

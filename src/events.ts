@@ -1,22 +1,19 @@
+import h from 'snabbdom/h'
+import { init } from 'snabbdom'
+import { VNode } from 'snabbdom/vnode'
+
+const patch = init([])
+let prevVtree: Element | VNode = document.querySelector('#app')!
+
+function updateDOM(vtree: VNode) {
+  patch(prevVtree, vtree)
+  prevVtree = vtree
+}
+
 interface State {
   onePressed: boolean,
   twoPressed: boolean,
   threePressed: boolean,
-}
-
-const app = document.querySelector('#app')!
-app.innerHTML = `
-  <button class="one">1</button>
-  <button class="two">2</button>
-  <button class="three">3</button>
-  <span></span>
-`
-
-function render(state: State) {
-  const span = app.querySelector('span')!
-  span.innerHTML = state.onePressed && state.twoPressed && state.threePressed
-    ? 'All buttons was pressed'
-    : ''
 }
 
 const state: State = {
@@ -25,23 +22,39 @@ const state: State = {
   threePressed: false,
 }
 
-render(state)
+function render(state: State) {
+  return h('div', [
+    h('button.one', '1'),
+    h('button.two', '2'),
+    h('button.three', '3'),
+    state.onePressed && state.twoPressed && state.threePressed
+      ? 'All buttons are pressed'
+      : '',
+  ])
+}
 
+function update(state: State) {
+  const vtree = render(state)
+  updateDOM(vtree)
+}
+
+update(state)
 
 const one = document.querySelector('.one') as HTMLButtonElement
+const two = document.querySelector('.two') as HTMLButtonElement
+const three = document.querySelector('.three') as HTMLButtonElement
+
 one.addEventListener('click', () => {
   state.onePressed = true
-  render(state)
+  update(state)
 })
 
-const two = document.querySelector('.two') as HTMLButtonElement
 two.addEventListener('click', () => {
   state.twoPressed = true
-  render(state)
+  update(state)
 })
 
-const three = document.querySelector('.two') as HTMLButtonElement
 three.addEventListener('click', () => {
   state.threePressed = true
-  render(state)
+  update(state)
 })

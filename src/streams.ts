@@ -1,44 +1,31 @@
-import xs from 'xstream'
-import fromEvent from 'xstream/extra/fromEvent'
+// import { div, button, VNode } from '@cycle/dom'
+// import xs from 'xstream'
 
-interface State {
-  allButtonsPressed: boolean,
-}
-
-const app = document.querySelector('#app')!
-app.innerHTML = `
-  <button class="one">1</button>
-  <button class="two">2</button>
-  <button class="three">3</button>
-  <span></span>
-`
-
-function render(state: State) {
-  const span = app.querySelector('span')!
-  span.innerHTML = state.allButtonsPressed
-    ? 'All buttons was pressed'
-    : ''
-}
-
-const state: State = {
-  allButtonsPressed: false,
-}
-
-render(state)
+// function render(allButtonsPressed: boolean): VNode {
+//   return div([
+//     button('.one', 1),
+//     button('.two', 2),
+//     button('.three', 3),
+//     allButtonsPressed ? 'All buttons are pressed' : '',
+//   ])
+// }
 
 
-const one = document.querySelector('.one') as HTMLButtonElement
-const two = document.querySelector('.two') as HTMLButtonElement
-const three = document.querySelector('.two') as HTMLButtonElement
+// interface Source {
+//   DOM: any
+// }
 
-const allButtonsPressed$ = xs.combine(
-  fromEvent(one, 'click'),
-  fromEvent(two, 'click'),
-  fromEvent(three, 'click'),
-)
+// function main({ DOM }: Source) {
+//   const allButtonsPressed$ = xs.combine(
+//     DOM.select('.one').events('click'),
+//     DOM.select('.two').events('click'),
+//     DOM.select('.three').events('click'),
+//   )
 
-allButtonsPressed$.addListener({
-  next: () => {
-    render({ allButtonsPressed: true })
-  },
-})
+//   const state$ = allButtonsPressed$.mapTo(true).startWith(false)
+
+//   return {
+//     DOM: state$.map(render),
+//   }
+// }
+
