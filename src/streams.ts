@@ -1,31 +1,59 @@
-// import { div, button, VNode } from '@cycle/dom'
-// import xs from 'xstream'
+import h from 'snabbdom/h'
+import { init } from 'snabbdom'
+import { VNode } from 'snabbdom/vnode'
+import fromEvent from 'xstream/extra/fromEvent'
+import xs from 'xstream'
 
-// function render(allButtonsPressed: boolean): VNode {
-//   return div([
-//     button('.one', 1),
-//     button('.two', 2),
-//     button('.three', 3),
-//     allButtonsPressed ? 'All buttons are pressed' : '',
-//   ])
-// }
+const patch = init([])
+let prevVtree: Element | VNode = document.querySelector('#app')!
 
+function updateDOM(vtree: VNode) {
+  patch(prevVtree, vtree)
+  prevVtree = vtree
+}
 
-// interface Source {
-//   DOM: any
-// }
+interface State {
+  allButtonsPressed: boolean,
+}
 
-// function main({ DOM }: Source) {
-//   const allButtonsPressed$ = xs.combine(
-//     DOM.select('.one').events('click'),
-//     DOM.select('.two').events('click'),
-//     DOM.select('.three').events('click'),
-//   )
+const state: State = {
+  allButtonsPressed: false,
+}
 
-//   const state$ = allButtonsPressed$.mapTo(true).startWith(false)
+function render(state: State) {
+  return h('div', [
+    h('button.one', '1'),
+    h('button.two', '2'),
+    h('button.three', '3'),
+    state.allButtonsPressed
+      ? 'All buttons are pressed'
+      : '',
+  ])
+}
 
-//   return {
-//     DOM: state$.map(render),
-//   }
-// }
+function update(state: State) {
+  const vtree = render(state)
+  updateDOM(vtree)
+}
 
+update(state)
+
+const one = document.querySelector('.one') as HTMLButtonElement
+const two = document.querySelector('.two') as HTMLButtonElement
+const three = document.querySelector('.three') as HTMLButtonElement
+
+const allButtonsPressed$ = xs
+  .combine(
+    fromEvent(one, 'click'),
+    fromEvent(two, 'click'),
+    fromEvent(three, 'click'),
+  )
+  .mapTo(true)
+  .startWith(false)
+
+allButtonsPressed$.addListener({
+  next: allButtonsPressed => {
+    state.allButtonsPressed = allButtonsPressed
+    update(state)
+  },
+})
